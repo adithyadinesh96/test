@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
-      - name: Install Dependencies
-        run: npm install
       - name: Deploy to Firebase
         uses: lowply/deploy-firebase@v0.0.2
         env:
