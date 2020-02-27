@@ -1,22 +1,20 @@
-name: deploy_to_firebase_hosting
-
+name: Build and Deploy
 on:
   push:
-    tags:
-      - release-production-*
-
+    branches:
+      - master
 jobs:
-  deploy_to_firebase_hosting:
-
+  build:
+    name: Build and Deploy to Firebase Hosting
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout the repository
+      - name: Checkout Repo
         uses: actions/checkout@master
-      
+      - name: Install Dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only hosting
+        uses: lowply/deploy-firebase@v0.0.2
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
