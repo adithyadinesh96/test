@@ -8,7 +8,7 @@ version: 2.1
 parameters:
   deploy-micro-service-a:
     type: boolean
-    default: false
+    default: true
 
 jobs:
   say-hello:
