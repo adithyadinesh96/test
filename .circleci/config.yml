@@ -4,12 +4,6 @@ version: 2.1
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
-
-parameters:
-  deploy-micro-service-a:
-    type: boolean
-    default: true
-
 jobs:
   say-hello:
     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
@@ -28,6 +22,5 @@ jobs:
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
   say-hello-workflow:
-    when: << pipeline.parameters.deploy-micro-service-a >>
     jobs:
       - say-hello
