@@ -1,65 +1,171 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI SRE — Observability Dashboard</title>
+  <meta name="description" content="AI-powered Site Reliability Engineering observability dashboard">
+  <meta name="theme-color" content="#0a0e17">
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/7.9.1/firebase-app.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/7.9.1/firebase-auth.js"></script>
-    <script defer src="/__/firebase/7.9.1/firebase-database.js"></script>
-    <script defer src="/__/firebase/7.9.1/firebase-messaging.js"></script>
-    <script defer src="/__/firebase/7.9.1/firebase-storage.js"></script>
-    <!-- initialize the SDK after all desired features are loaded -->
-    <script defer src="/__/firebase/init.js"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete Updated using git</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+  <!-- Charting & Visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    .mi { font-family: 'Material Icons Round'; font-weight: normal; font-style: normal; font-size: 20px; display: inline-block; line-height: 1; text-transform: none; letter-spacing: normal; word-wrap: normal; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><span class="mi" style="font-size:18px">memory</span></div>
+      <div class="sidebar-brand">AI <span>SRE</span></div>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="#dashboard" class="nav-item active" data-page="dashboard">
+        <span class="nav-icon"><span class="mi">dashboard</span></span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#metrics" class="nav-item" data-page="metrics">
+        <span class="nav-icon"><span class="mi">monitoring</span></span>
+        <span>Metrics</span>
+      </a>
+      <a href="#service-map" class="nav-item" data-page="service-map">
+        <span class="nav-icon"><span class="mi">account_tree</span></span>
+        <span>Service Map</span>
+      </a>
 
-        try {
-          let app = firebase.app();
-          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
-  </body>
+      <div class="nav-section-label">Operations</div>
+      <a href="#incidents" class="nav-item" data-page="incidents">
+        <span class="nav-icon"><span class="mi">local_fire_department</span></span>
+        <span>Incidents</span>
+        <span class="nav-badge" id="incident-badge">2</span>
+      </a>
+      <a href="#logs" class="nav-item" data-page="logs">
+        <span class="nav-icon"><span class="mi">terminal</span></span>
+        <span>Log Explorer</span>
+      </a>
+      <a href="#alerts" class="nav-item" data-page="alerts">
+        <span class="nav-icon"><span class="mi">notifications_active</span></span>
+        <span>Alerts & On-Call</span>
+        <span class="nav-badge" id="alert-badge">1</span>
+      </a>
+
+      <div class="nav-section-label">Intelligence</div>
+      <a href="#ai-insights" class="nav-item" data-page="ai-insights">
+        <span class="nav-icon"><span class="mi">auto_awesome</span></span>
+        <span>AI Insights</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">JL</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">James Liu</div>
+          <div class="sidebar-user-role">SRE Engineer (On-Call)</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Main Content ===== -->
+  <div class="main-wrapper">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-search">
+        <span class="header-search-icon mi">search</span>
+        <input type="text" placeholder="Search services, metrics, incidents..." id="global-search">
+      </div>
+      <div class="header-actions">
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          LIVE
+        </div>
+        <button class="header-btn" title="Refresh" onclick="App.refresh()">
+          <span class="mi">refresh</span>
+        </button>
+        <div style="position:relative">
+          <button class="header-btn" title="Notifications" onclick="App.toggleNotifications()" id="notif-btn">
+            <span class="mi">notifications</span>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown">
+            <div class="notif-header">Notifications</div>
+            <div class="notif-item">
+              <div class="notif-icon-wrap" style="background:var(--accent-red-dim);color:var(--accent-red)"><span class="mi" style="font-size:16px">error</span></div>
+              <div class="notif-content">
+                <div class="notif-title">P1 Incident: Payment latency spike</div>
+                <div class="notif-time">35 minutes ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon-wrap" style="background:var(--accent-purple-dim);color:var(--accent-purple)"><span class="mi" style="font-size:16px">auto_awesome</span></div>
+              <div class="notif-content">
+                <div class="notif-title">AI detected unusual traffic pattern</div>
+                <div class="notif-time">12 minutes ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon-wrap" style="background:var(--accent-yellow-dim);color:var(--accent-yellow)"><span class="mi" style="font-size:16px">warning</span></div>
+              <div class="notif-content">
+                <div class="notif-title">Disk space warning on db-primary</div>
+                <div class="notif-time">1 hour ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="header-btn" title="Settings">
+          <span class="mi">settings</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="page-content" id="page-content">
+      <!-- Pages rendered here by router -->
+    </main>
+  </div>
+</div>
+
+<!-- Incident Detail Modal -->
+<div class="modal-overlay" id="incident-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 id="modal-title" style="font-size:16px;font-weight:600;"></h3>
+        <p id="modal-subtitle" style="font-size:12px;color:var(--text-tertiary);margin-top:2px;"></p>
+      </div>
+      <button class="modal-close" onclick="App.closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- JS Modules (order matters) -->
+<script src="js/mock-data.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/metrics.js"></script>
+<script src="js/incidents.js"></script>
+<script src="js/logs.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/ai-insights.js"></script>
+<script src="js/service-map.js"></script>
+<script src="js/app.js"></script>
+
+</body>
 </html>
